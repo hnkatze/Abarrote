@@ -1,0 +1,27 @@
+.nav-link {
+    color: #4A4A4A;
+
+    font-weight: bold;
+
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show>.nav-link {
+    color: #FFFFFF;
+    background-color: rgb(255, 0, 0);
+   
+}
+
+.nav-pills .nav-link:hover {
+    background-color: #89CFF3;
+
+    color: #FFFFFF;
+}
+
+.vertical-nav {
+    width: 250px;
+    min-height: 100vh;
+    padding: 30px 0;
+    background-color: #DDF2FD;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navegación</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+    background-color: #F3F3F3; /* Un color beige claro para un fondo cálido */
+    font-family: 'Lato', sans-serif; /* Fuente Lato para el texto general */
+}
+
+.nav-link {
+    color: #4A4A4A; /* Un color gris oscuro para mejor contraste */
+    font-weight: bold; /* Texto en negrita */
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    color: #FFFFFF;
+    background-color: rgb(0, 174, 255); /* Un naranja vibrante para elementos activos */
+}
+
+.nav-pills .nav-link:hover {
+    background-color: #89CFF3; /* Un naranja más claro al pasar el mouse */
+    color: #FFFFFF;
+}
+
+.vertical-nav {
+    width: 250px;
+    min-height: 100vh;
+    padding: 30px 0;
+    background-color: #DDF2FD; /* Un tono más claro de beige para la barra de navegación */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra sutil para dar profundidad */
+}
+
+    </style>
+</head>
+
+<body>
+    <div class="vertical-nav">
+        <ul class="nav flex-column nav-pills">
+            <li class="nav-item"><a class="nav-link active" href="#">Inicio</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" id="botonCaja">Caja</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" id="botonReportes">Reportes</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" id="botonCerrarSesion">Cerrar Sesión</a></li>
+        </ul>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../helpers/navigations.js"></script>
+</body>
+
+</html>
