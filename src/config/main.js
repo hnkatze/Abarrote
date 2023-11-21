@@ -18,6 +18,7 @@ const {
 const { db } = require("./firebase");
 const collectionRef = collection(db, "inventory");
 const collectionRefUser = collection(db, "users");
+const collectionRefinvoice = collection(db, "invoice");
 let mainWindow;
 
 function createWindow() {
@@ -133,7 +134,6 @@ ipcMain.handle('editProduct', async (event, id, codigo, nombre, descripcion, pre
     }
 });
 
-
 ipcMain.handle("getProduct", async () => {
   try {
     const docis = await getDocs(collectionRef);
@@ -191,3 +191,22 @@ ipcMain.handle('editUsers', async (event, id, role, username, password) => {
         return { success: false, error: error.message };
     }
 });
+ipcMain.handle("addInvoice",
+  async (event,Nombre, Fecha, FacturaNo,subTotal, ISV, Total, ProduInvoice ) => {
+    try {
+      await addDoc(collectionRefinvoice, {
+        Nombre,
+        Fecha,
+        FacturaNo,
+        subTotal,
+        ISV,
+        Total,
+        ProduInvoice
+      });
+      return { success: true };
+    } catch (error) {
+      console.error("Error al crear la nueva Factura: ", error);
+      return { success: false, error: error.message };
+    }
+  }
+);
