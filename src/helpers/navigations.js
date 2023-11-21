@@ -17,7 +17,9 @@ document.getElementById('botonHome').addEventListener('click', () => {
 document.getElementById('botonCaja').addEventListener('click', () => {
   navigateTo('caja');
 });
-
+document.getElementById('botonFactura').addEventListener('click', () => {
+  navigateTo('invoice');
+});
 document.getElementById('botonReportes').addEventListener('click', () => {
   navigateTo('reportes');
 });
