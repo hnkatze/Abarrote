@@ -210,3 +210,23 @@ ipcMain.handle("addInvoice",
     }
   }
 );
+ipcMain.handle("getInvoice", async () => {
+  try {
+    const docis = await getDocs(collectionRefinvoice);
+    let productos = docis.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return productos;
+  } catch (error) {
+    console.error("Error al obtener productos:", error);
+    return [];
+  }
+});
+ipcMain.handle("deleteInvoice", async (event, id) => {
+  try {
+    const productDoc = doc(db, "invoice", id);
+    await deleteDoc(productDoc);
+    return { success: true };
+  } catch (error) {
+    console.error("Error al eliminar la factura:", error);
+    return { success: false, error: error.message };
+  }
+});

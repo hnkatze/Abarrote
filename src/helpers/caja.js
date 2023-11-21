@@ -1,17 +1,23 @@
 const { ipcRenderer } = require("electron");
 const { default: Swal } = require("sweetalert2");
 let productos = [];
+let invoice = [];
 let productosTabla = [];
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     productos = await ipcRenderer.invoke("getProduct");
+
     displayInventory();
   } catch (error) {
     console.error("Error al cargar productos desde Firebase:", error);
   }
 });
 
-function displayInventory() {
+async function displayInventory() {
+  invoice = await ipcRenderer.invoke("getInvoice");
+  const facturaNoElement = document.getElementById("facturaNumero");
+  const numeroFactura = invoice.length + 1;
+  facturaNoElement.textContent = numeroFactura.toString().padStart(5, '0');
   const select = document.getElementById("productoSeleccionado");
   productos.forEach((producto) => {
     const option = document.createElement("option");
@@ -28,9 +34,10 @@ function agregarProductoATabla() {
   const cantidad = document.getElementById("cantidadProducto").value;
 
   const producto = productos.find((p) => p.id === productoSeleccionado);
-
+console.log(productos)
   if (producto && cantidad > 0) {
-    let newData = {
+    if(cantidad < producto.cantidad){
+let newData = {
       id: producto.id,
       Nombre: producto.nombre,
       Cantidad: cantidad,
@@ -39,6 +46,11 @@ function agregarProductoATabla() {
     };
     productosTabla.push(newData);
     actualizarTabla();
+    }
+    else{
+       Swal.fire("Error!", "No Hay Suficiente Stock Para Este producto, Intenta una cantida menor", "Error");
+    }
+    
   }
 }
 
@@ -119,13 +131,54 @@ async function upData() {
   );
 
   if (result.success) {
+    actualizarInventarioDespuesDeFactura(FaturaProducts);
     displayInventory();
-    Swal.fire("¡Éxito!", "Producto agregado con éxito.", "success");
+    limpiarDespuesDeFactura();
+    Swal.fire("¡Éxito!", "La Factura se guardo con exito.", "success");
     displayInventory();
   } else {
     console.error("Error al agregar producto:", result.error);
   }
 }
+function limpiarDespuesDeFactura() {
+  const tabla = document.getElementById("productosAgregados");
+  tabla.innerHTML = '';
+
+  const inputCliente = document.getElementById("clienteNombre");
+  inputCliente.value = '';
+
+  productosTabla = [];
+
+  document.getElementById("subTotal").textContent = '0.00';
+  document.getElementById("isv").textContent = '0.00';
+  document.getElementById("totalFinal").textContent = '0.00';
+}
+async function actualizarInventarioDespuesDeFactura(productosFactura) {
+  for (const productoFactura of productosFactura) {
+    try {
+      // Encuentra el producto en el array local y actualiza su cantidad
+      const producto = productos.find(p => p.id === productoFactura.id);
+      if (producto) {
+        const nuevaCantidad = producto.cantidad - productoFactura.Cantidad; // Ajusta según tu lógica de negocio
+        producto.cantidad = nuevaCantidad;
+
+        // Actualiza el producto en Firestore
+        const response = await ipcRenderer.invoke('editProduct', producto.id, producto.codigo, producto.nombre, producto.descripcion, producto.precio, producto.precioCosto, nuevaCantidad);
+        
+        if (!response.success) {
+          console.error("Error al actualizar producto en Firestore:", response.error);
+          // Opcionalmente, manejar el error como sea apropiado
+        }
+      }
+    } catch (error) {
+      console.error('Error al actualizar la cantidad del producto:', error);
+      // Opcionalmente, manejar el error como sea apropiado
+    }
+  }
+
+  // Aquí puedes realizar acciones adicionales una vez que se han actualizado todos los productos
+}
+
 document.querySelector(".btn-success").addEventListener("click", upData);
 document
   .querySelector(".btn-primary")
