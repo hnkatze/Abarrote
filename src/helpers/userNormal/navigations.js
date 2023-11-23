@@ -3,7 +3,7 @@ const { ipcRenderer } = require('electron');
 
 
 function navigateTo(page) {
-  ipcRenderer.send('navigate', page);
+  ipcRenderer.send('navigateUserNormal', page);
 }
 
 document.addEventListener('DOMContentLoaded', (event) => {
@@ -19,10 +19,6 @@ document.getElementById('botonCaja').addEventListener('click', () => {
 });
 document.getElementById('botonFactura').addEventListener('click', () => {
   navigateTo('invoice');
-});
-
-document.getElementById('botonUser').addEventListener('click', () => {
-  navigateTo('user');
 });
 
 });

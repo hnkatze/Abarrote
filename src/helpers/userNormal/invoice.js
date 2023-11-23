@@ -16,12 +16,7 @@ console.log(productos);
                       <td>${item.Fecha}</td>
                       <td>
                             <button class="ViewButton" data-id="${item.id}">
-                                <img src="../svg/Eye.svg" class="View" alt="Borrar">
-                            </button>
-                            </td>
-                            <td>
-                            <button class="DeleteButton" data-id="${item.id}">
-                                <img src="../svg/Delete.svg" class="Delete" alt="Borrar">
+                                <img src="../../svg/Eye.svg" class="View" alt="Vied">
                             </button>
                             </td>
                     </tr>`;
@@ -36,8 +31,6 @@ console.log(productos);
 document
   .getElementById("searchInput")
   .addEventListener("input", filtrarProductos);
-
-
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
@@ -69,26 +62,6 @@ function filtrarProductos() {
   displayInventory(productosFiltrados);
 }
 
-async function deleteProduct(id) {
-  try {
-    const result = await ipcRenderer.invoke("deleteInvoice", id);
-    if (result.success) {
-      console.log("Producto eliminado con éxito.");
-      productos = productos.filter((p) => p.id !== id);
-      
-      Swal.fire(
-        'Pues Se Borro!',
-        'Pero A Que Costo?.',
-        'question'
-    );
-    displayInventory();
-    } else {
-      console.error("Error al eliminar el producto:", result.error);
-    }
-  } catch (error) {
-    console.error("Error al eliminar el producto:", error);
-  }
-}
 function mostrarDetallesFactura(id) {
   const factura = productos.find(item => item.id === id);
   if (factura?.ProduInvoice) {
@@ -106,12 +79,6 @@ function mostrarDetallesFactura(id) {
 }
 
 function setupDeleteButtons() {
-  document.querySelectorAll(".DeleteButton, .Delete").forEach((element) => {
-    element.addEventListener("click", () => {
-      const id = element.closest(".DeleteButton").getAttribute("data-id");
-      deleteProduct(id);
-    });
-  });
 
 document.querySelectorAll(".ViewButton, .View").forEach((element) => {
   element.addEventListener("click", () => {
@@ -143,8 +110,6 @@ function filtrarPorFecha() {
     displayInventory(productos);
   }
 }
-
-
 
 function calcularYMostrarTotalesYGanancias(productosFiltrados) {
   let total = 0;

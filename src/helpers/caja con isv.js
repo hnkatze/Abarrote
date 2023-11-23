@@ -6,6 +6,7 @@ let productosTabla = [];
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     productos = await ipcRenderer.invoke("getProduct");
+
     displayInventory();
   } catch (error) {
     console.error("Error al cargar productos desde Firebase:", error);
@@ -103,7 +104,17 @@ function actualizarSubTotal() {
   document.getElementById("subTotal").textContent = subTotal.toFixed(2);
 }
 
+function actualizarISVTotal() {
+  const isvf = document.getElementById("isv");
+  const totalFinal = document.getElementById("totalFinal");
+  const subTotalSpan = document.getElementById("subTotal");
+  let subTotalActual = parseFloat(subTotalSpan.textContent) || 0;
 
+  let ISV = subTotalActual * 0.15;
+  let totalfi = subTotalActual + ISV;
+  isvf.textContent = ISV.toFixed(2);
+  totalFinal.textContent = totalfi.toFixed(2);
+}
 async function upData() {
   const fecha = new Date();
   const dia = fecha.getDate();
@@ -113,7 +124,11 @@ async function upData() {
   const facturaNoElement = document.getElementById("facturaNumero");
   const FacturaNo = facturaNoElement ? facturaNoElement.textContent : null;
   const subTotalElement = document.getElementById("subTotal");
-   const Total = parseFloat(subTotalElement ? subTotalElement.textContent : 0);
+   const subTotal = parseFloat(subTotalElement ? subTotalElement.textContent : 0);
+  const ISVElement = document.getElementById("isv");
+   const ISV = parseFloat(ISVElement ? ISVElement.textContent : 0);
+  const TotalElement = document.getElementById("totalFinal");
+    const Total = parseFloat(TotalElement ? TotalElement.textContent : 0);
   const Nombre = document.getElementById("clienteNombre").value;
   const FaturaProducts = productosTabla;
   const Fecha = `${dia < 10 ? "0" + dia : dia}/${
@@ -131,6 +146,8 @@ const Ganancia = parseFloat((Total - TotalCosto).toFixed(2));
     Nombre,
     Fecha,
     FacturaNo,
+    subTotal,
+    ISV,
     Total,
     Ganancia,
     FaturaProducts
@@ -155,6 +172,8 @@ function limpiarDespuesDeFactura() {
   productosTabla = [];
 
   document.getElementById("subTotal").textContent = "0.00";
+  document.getElementById("isv").textContent = "0.00";
+  document.getElementById("totalFinal").textContent = "0.00";
 }
 async function actualizarInventarioDespuesDeFactura(productosFactura) {
   for (const productoFactura of productosFactura) {
@@ -192,4 +211,6 @@ document.querySelector(".btn-success").addEventListener("click", upData);
 document
   .querySelector(".btn-primary")
   .addEventListener("click", agregarProductoATabla);
-
+document
+  .querySelector(".btn-secondary")
+  .addEventListener("click", actualizarISVTotal);

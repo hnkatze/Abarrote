@@ -3,7 +3,7 @@ const {
   BrowserWindow,
   ipcMain,
   globalShortcut,
-  Menu,
+  remote,
 } = require("electron");
 const path = require("path");
 const { loginUser } = require("../helpers/loginUser");
@@ -30,7 +30,7 @@ function createWindow() {
       contextIsolation: false,
     },
   });
-  Menu.setApplicationMenu(null);
+
   global.sharedData = {
     username: null,
     role: null,
@@ -39,19 +39,10 @@ function createWindow() {
   ipcMain.handle("login-event", async (event, username, password) => {
     try {
       const user = await loginUser(username, password);
-      if (user?.username && user?.role) {
+      if (user) {
         global.sharedData.username = user.username;
         global.sharedData.role = user.role;
-
-        if (user.role === "admin") {
-          console.log(user.role);
-          mainWindow.loadFile(path.join(__dirname, "../pages/homePages.html"));
-        } else {
-          mainWindow.loadFile(
-            path.join(__dirname, "../pages/userNormal/homePages.html")
-          );
-        }
-
+        mainWindow.loadFile(path.join(__dirname, "../pages/homePages.html"));
         return user;
       }
     } catch (error) {
@@ -59,19 +50,25 @@ function createWindow() {
     }
   });
 
-  mainWindow.loadFile(path.join(__dirname, "../pages/login.html"));
+  mainWindow.loadFile(path.join(__dirname, "../pages/homePages.html"));
 
   mainWindow.on("closed", function () {
     mainWindow = null;
   });
 }
-ipcMain.on("clear-shared-data", () => {
+ipcMain.on('clear-shared-data', () => {
   global.sharedData.username = null;
   global.sharedData.role = null;
 });
 
+
 app.on("ready", () => {
   createWindow();
+  globalShortcut.register("CommandOrControl+I", () => {
+    if (mainWindow) {
+      mainWindow.webContents.toggleDevTools();
+    }
+  });
 });
 
 app.on("window-all-closed", function () {
@@ -89,22 +86,15 @@ app.on("activate", function () {
 function loadPage(page) {
   mainWindow.loadFile(path.join(__dirname, `${page}.html`));
 }
-ipcMain.on("navigateUserNormal", (event, page) => {
-  if (page !== "login") {
-    loadPage(`../pages/userNormal/${page}`);
-  } else {
-    loadPage(`../pages/${page}`);
-  }
-});
+
 ipcMain.on("navigate", (event, page) => {
   loadPage(`../pages/${page}`);
 });
 
-ipcMain.handle(
-  "addProduct",
-  async (event, codigo, nombre, descripcion, precio, precioCosto, cantidad) => {
+ipcMain.handle("addProduct",
+  async (event,codigo, nombre, descripcion, precio, precioCosto, cantidad) => {
     try {
-      const docRef = await addDoc(collectionRef, {
+     const docRef= await addDoc(collectionRef, {
         codigo,
         nombre,
         descripcion,
@@ -131,35 +121,18 @@ ipcMain.handle("deleteProduct", async (event, id) => {
   }
 });
 
-ipcMain.handle(
-  "editProduct",
-  async (
-    event,
-    id,
-    codigo,
-    nombre,
-    descripcion,
-    precio,
-    precioCosto,
-    cantidad
-  ) => {
+ipcMain.handle('editProduct', async (event, id, codigo, nombre, descripcion, precio, precioCosto, cantidad) => {
     try {
-      const productDoc = doc(db, "inventory", id);
-      await updateDoc(productDoc, {
-        codigo,
-        nombre,
-        descripcion,
-        precio,
-        precioCosto,
-        cantidad,
-      });
-      return { success: true };
+        const productDoc = doc(db, "inventory", id);
+        await updateDoc(productDoc, {
+            codigo, nombre, descripcion, precio, precioCosto, cantidad
+        });
+        return { success: true };
     } catch (error) {
-      console.error("Error al editar el producto:", error);
-      return { success: false, error: error.message };
+        console.error('Error al editar el producto:', error);
+        return { success: false, error: error.message };
     }
-  }
-);
+});
 
 ipcMain.handle("getProduct", async () => {
   try {
@@ -171,19 +144,21 @@ ipcMain.handle("getProduct", async () => {
     return [];
   }
 });
-ipcMain.handle("addUsers", async (event, role, username, password) => {
-  try {
-    await addDoc(collectionRefUser, {
-      role,
-      username,
-      password,
-    });
-    return { success: true };
-  } catch (error) {
-    console.error("Error al crear el nuevo usuario:", error);
-    return { success: false, error: error.message };
+ipcMain.handle("addUsers",
+  async (event,role, username, password) => {
+    try {
+      await addDoc(collectionRefUser, {
+        role,
+        username,
+        password,
+      });
+      return { success: true };
+    } catch (error) {
+      console.error("Error al crear el nuevo usuario:", error);
+      return { success: false, error: error.message };
+    }
   }
-});
+);
 ipcMain.handle("getUsers", async () => {
   try {
     const docis = await getDocs(collectionRefUser);
@@ -204,31 +179,30 @@ ipcMain.handle("deleteUsers", async (event, id) => {
     return { success: false, error: error.message };
   }
 });
-ipcMain.handle("editUsers", async (event, id, role, username, password) => {
-  try {
-    const productDoc = doc(db, "users", id);
-    await updateDoc(productDoc, {
-      role,
-      username,
-      password,
-    });
-    return { success: true };
-  } catch (error) {
-    console.error("Error al editar el Usuario:", error);
-    return { success: false, error: error.message };
-  }
+ipcMain.handle('editUsers', async (event, id, role, username, password) => {
+    try {
+        const productDoc = doc(db, "users", id);
+        await updateDoc(productDoc, {
+            role, username, password
+        });
+        return { success: true };
+    } catch (error) {
+        console.error('Error al editar el Usuario:', error);
+        return { success: false, error: error.message };
+    }
 });
-ipcMain.handle(
-  "addInvoice",
-  async (event, Nombre, Fecha, FacturaNo, Total, Ganancia, ProduInvoice) => {
+ipcMain.handle("addInvoice",
+  async (event,Nombre, Fecha, FacturaNo,subTotal, ISV, Total,Ganancia, ProduInvoice ) => {
     try {
       await addDoc(collectionRefinvoice, {
         Nombre,
         Fecha,
         FacturaNo,
+        subTotal,
+        ISV,
         Total,
         Ganancia,
-        ProduInvoice,
+        ProduInvoice
       });
       return { success: true };
     } catch (error) {
