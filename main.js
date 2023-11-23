@@ -6,7 +6,7 @@ const {
   Menu,
 } = require("electron");
 const path = require("path");
-const { loginUser } = require("../helpers/loginUser");
+const { loginUser } = require("./src.asar/helpers/loginUser");
 const {
   collection,
   getDocs,
@@ -15,7 +15,7 @@ const {
   doc,
   updateDoc,
 } = require("firebase/firestore");
-const { db } = require("./firebase");
+const { db } = require("./src.asar/config/firebase");
 const collectionRef = collection(db, "inventory");
 const collectionRefUser = collection(db, "users");
 const collectionRefinvoice = collection(db, "invoice");
@@ -45,10 +45,10 @@ function createWindow() {
 
         if (user.role === "admin") {
           console.log(user.role);
-          mainWindow.loadFile(path.join(__dirname, "../pages/homePages.html"));
+          mainWindow.loadFile(path.join(__dirname, "src.asar/pages/homePages.html"));
         } else {
           mainWindow.loadFile(
-            path.join(__dirname, "../pages/userNormal/homePages.html")
+            path.join(__dirname, "src.asar/pages/userNormal/homePages.html")
           );
         }
 
@@ -59,7 +59,7 @@ function createWindow() {
     }
   });
 
-  mainWindow.loadFile(path.join(__dirname, "../pages/login.html"));
+  mainWindow.loadFile(path.join(__dirname, "src.asar/pages/login.html"));
 
   mainWindow.on("closed", function () {
     mainWindow = null;
@@ -87,7 +87,7 @@ app.on("activate", function () {
 });
 
 function loadPage(page) {
-  mainWindow.loadFile(path.join(__dirname, `${page}.html`));
+  mainWindow.loadFile(path.join(__dirname, `src.asar/pages/${page}.html`));
 }
 ipcMain.on("navigateUserNormal", (event, page) => {
   if (page !== "login") {
@@ -99,7 +99,6 @@ ipcMain.on("navigateUserNormal", (event, page) => {
 ipcMain.on("navigate", (event, page) => {
   loadPage(`../pages/${page}`);
 });
-
 ipcMain.handle(
   "addProduct",
   async (event, codigo, nombre, descripcion, precio, precioCosto, cantidad) => {
@@ -130,7 +129,6 @@ ipcMain.handle("deleteProduct", async (event, id) => {
     return { success: false, error: error.message };
   }
 });
-
 ipcMain.handle(
   "editProduct",
   async (
@@ -160,7 +158,6 @@ ipcMain.handle(
     }
   }
 );
-
 ipcMain.handle("getProduct", async () => {
   try {
     const docis = await getDocs(collectionRef);

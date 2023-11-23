@@ -3,3 +3,4 @@ ConnCell-win32-x64
 ConnCell-platform=darwin-win32-x64
 Gmail pass.txt
 src/config/firebase.js
+dist

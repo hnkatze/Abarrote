@@ -2,17 +2,44 @@
   "name": "abarrote",
   "version": "1.0.0",
   "description": "",
-  "main": "src/config/main.js",
+  "main": "./main.js",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "electron-builder"
+  },
+  "build": {
+    "productName": "ConnCell",
+    "asar": false,
+      "files": [
+    "**/*",
+    "!src/**/*", 
+    "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+    "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+    "!**/*.{o,hprof,orig,pyc,pyo,rbc}",
+    "!**/.*",
+    "!*.code-workspace",
+    "!**/*.{ts,map}",
+    "!**/{.gitignore,.editorconfig,.vscode,}",
+    "!**/{test,__tests__,tests,specs}",
+    "!**/{demo,demos,example,examples}",
+    "!**/{doc,docs,documentation}"
+  ],
+    "directories": {
+      "output": "dist"
+    },
+      "win": {
+    "target": "nsis",
+    "icon": "./Cell.ico"
+  }
   },
   "keywords": [],
   "author": "hnkatze",
   "license": "ISC",
   "devDependencies": {
+    "asar": "^3.2.0",
     "electron": "^27.0.4",
-    "electron-packager": "^17.1.2"
+    "electron-builder": "^24.6.4"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -20,5 +47,4 @@
     "firebase": "^10.6.0",
     "sweetalert2": "^11.10.0"
   }
-
 }
