@@ -1,6 +1,6 @@
 node_modules
 ConnCell-win32-x64
 ConnCell-platform=darwin-win32-x64
-Gmail pass.txt
+Gpass.txt
 src/config/firebase.js
 dist

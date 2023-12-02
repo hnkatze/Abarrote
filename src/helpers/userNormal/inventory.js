@@ -28,6 +28,7 @@ document
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     productos = await ipcRenderer.invoke("getProduct");
+    productos.sort((a, b) => a.nombre.localeCompare(b.nombre));
     displayInventory();
   } catch (error) {
     console.error("Error al cargar productos desde Firebase:", error);

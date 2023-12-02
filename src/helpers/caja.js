@@ -1,11 +1,13 @@
 const { ipcRenderer } = require("electron");
 const { default: Swal } = require("sweetalert2");
 let productos = [];
-let invoice = [];
+let invoices = [];
 let productosTabla = [];
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    productos = await ipcRenderer.invoke("getProduct");
+    invoices = await ipcRenderer.invoke("getInvoice");
+  productos = await ipcRenderer.invoke("getProduct");
+  productos.sort((a, b) => a.nombre.localeCompare(b.nombre));
     displayInventory();
   } catch (error) {
     console.error("Error al cargar productos desde Firebase:", error);
@@ -15,30 +17,31 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function displayInventory() {
   const numeroFactura = await obtenerSiguienteNumeroFactura();
   const facturaNoElement = document.getElementById("facturaNumero");
-  facturaNoElement.textContent = numeroFactura;
-  const select = document.getElementById("productoSeleccionado");
+   if (!isNaN(numeroFactura)) {
+    facturaNoElement.textContent = numeroFactura.toString();
+  } else {
+    facturaNoElement.textContent = "Error"; 
+  }
+   const select = document.getElementById("productoSeleccionado");
   productos.forEach((producto) => {
     const option = document.createElement("option");
     option.value = producto.id;
     option.textContent = producto.nombre;
     select.appendChild(option);
   });
+
 }
 async function obtenerSiguienteNumeroFactura() {
   try {
-    const invoices = await ipcRenderer.invoke("getInvoice");
-    const numerosFactura = invoices.map((factura) =>
-      parseInt(factura.FacturaNo)
-    );
-    const maxNumero = Math.max(...numerosFactura, 0);
-    const siguienteNumero = maxNumero + 1;
-
-    return siguienteNumero.toString().padStart(5, "0");
+    const numerosFactura = invoices.length;
+    const siguienteNumero = numerosFactura + 1;
+    return siguienteNumero;
   } catch (error) {
     console.error("Error al obtener las facturas:", error);
     return "00001";
   }
 }
+
 function agregarProductoATabla() {
   const productoSeleccionado = document.getElementById(
     "productoSeleccionado"
